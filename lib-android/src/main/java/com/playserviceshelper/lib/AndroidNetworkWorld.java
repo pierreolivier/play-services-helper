@@ -14,10 +14,13 @@ import com.playserviceshelper.lib.adapters.IntentAdapter;
  * Created by Pierre-Olivier on 02/02/2015.
  */
 public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static int RC_SIGN_IN = 9001;
+    private final static int RC_SIGN_IN = 9001;
+    private final static int RC_SELECT_PLAYERS = 10000;
 
     protected Activity mActivity;
     protected GoogleApiClient mGoogleApiClient;
+
+    protected NetworkConfiguration mConfiguration;
 
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInflow = true;
@@ -28,12 +31,13 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     }
 
     @Override
-    public void init() {
+    public void init(NetworkConfiguration configuration) {
+        mConfiguration = configuration;
+
         mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                        // add other APIs and scopes here as needed
                 .build();
     }
 
@@ -58,7 +62,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
             mSignInClicked = false;
             mResolvingConnectionFailure = true;
 
-            if (!BaseGameUtils.resolveConnectionFailure(mActivity, mGoogleApiClient, connectionResult, RC_SIGN_IN, mActivity.getText(R.string.signin_other_error).toString())) {
+            if (!BaseGameUtils.resolveConnectionFailure(mActivity, mGoogleApiClient, connectionResult, RC_SIGN_IN, mConfiguration.getSigninOtherError())) {
                 mResolvingConnectionFailure = false;
             }
         }
@@ -89,7 +93,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 if (resultCode == Activity.RESULT_OK) {
                     mGoogleApiClient.connect();
                 } else {
-                    BaseGameUtils.showActivityResultError(mActivity, requestCode, resultCode, R.string.signin_failure);
+                    BaseGameUtils.showActivityResultError(mActivity, requestCode, resultCode, mConfiguration.getSigninFailure());
                 }
             }
         }
@@ -105,5 +109,15 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     public void signOutclicked() {
         mSignInClicked = false;
         Games.signOut(mGoogleApiClient);
+    }
+
+    @Override
+    public void quickGame(int variant, int minAutoMatchPlayers, int maxAutoMatchPlayers) {
+
+    }
+
+    @Override
+    public void invite(int variant, int minAutoMatchPlayers, int maxAutoMatchPlayers) {
+
     }
 }
