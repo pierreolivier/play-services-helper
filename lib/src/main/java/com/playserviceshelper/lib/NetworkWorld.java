@@ -6,7 +6,13 @@ import com.playserviceshelper.lib.adapters.IntentAdapter;
  * Created by Pierre-Olivier on 02/02/2015.
  */
 public abstract class NetworkWorld {
+    protected NetworkListeners mListeners;
+
     public abstract void init(NetworkConfiguration networkConfiguration);
+
+    public void setListeners(NetworkListeners mListeners) {
+        this.mListeners = mListeners;
+    }
 
     public abstract void onStart();
     public abstract void onStop();
