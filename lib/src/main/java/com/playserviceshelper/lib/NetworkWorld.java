@@ -23,4 +23,7 @@ public abstract class NetworkWorld {
 
     public abstract void quickGame(int variant, int minAutoMatchPlayers, int maxAutoMatchPlayers);
     public abstract void invite(int variant, int minAutoMatchPlayers, int maxAutoMatchPlayers);
+
+    public abstract void enableInvitation();
+    public abstract void disableInvitation();
 }

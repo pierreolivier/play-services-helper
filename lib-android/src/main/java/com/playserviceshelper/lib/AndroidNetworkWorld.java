@@ -1,6 +1,8 @@
 package com.playserviceshelper.lib;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +12,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.*;
 import com.google.example.games.basegameutils.BaseGameUtils;
 import com.playserviceshelper.lib.adapters.AndroidIntentAdapter;
@@ -22,13 +26,14 @@ import java.util.List;
 /**
  * Created by Pierre-Olivier on 02/02/2015.
  */
-public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, RoomUpdateListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener {
+public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, RoomUpdateListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener, OnInvitationReceivedListener {
     private final static int RC_SIGN_IN = 9001;
     private final static int RC_SELECT_PLAYERS = 10000;
     private final static int RC_WAITING_ROOM = 10002;
 
     protected Activity mActivity;
     protected GoogleApiClient mGoogleApiClient;
+    protected Room mRoom;
 
     protected NetworkConfiguration mConfiguration;
 
@@ -53,8 +58,27 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onConnected(Bundle bundle) {
+        boolean autoJoin = false;
+
+        if (bundle != null) {
+            Invitation inv = bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
+
+            if (inv != null) {
+                // accept mInvitation
+                RoomConfig.Builder roomConfigBuilder = makeBasicRoomConfigBuilder();
+                roomConfigBuilder.setInvitationIdToAccept(inv.getInvitationId());
+                Games.RealTimeMultiplayer.join(mGoogleApiClient, roomConfigBuilder.build());
+
+                // prevent screen from sleeping during handshake
+                mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                // go to game screen
+                autoJoin = true;
+            }
+        }
+
         if(mListeners != null) {
-            mListeners.onConnected();
+            mListeners.onConnected(autoJoin);
         }
     }
 
@@ -141,7 +165,9 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             } else if (requestCode == RC_WAITING_ROOM) {
                 if (resultCode == Activity.RESULT_OK) {
-                    // (start game)
+                    if(mListeners != null) {
+                        mListeners.onStartSession();
+                    }
                 } else if (resultCode == Activity.RESULT_CANCELED) {
                     // Waiting room was dismissed with the back button. The meaning of this
                     // action is up to the game. You may choose to leave the room and cancel the
@@ -192,7 +218,17 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
         mActivity.startActivityForResult(intent, RC_SELECT_PLAYERS);
     }
 
-    private RoomConfig.Builder makeBasicRoomConfigBuilder() {
+    @Override
+    public void enableInvitation() {
+        Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void disableInvitation() {
+        Games.Invitations.unregisterInvitationListener(mGoogleApiClient);
+    }
+
+    public RoomConfig.Builder makeBasicRoomConfigBuilder() {
         return RoomConfig.builder(this)
                 .setMessageReceivedListener(this)
                 .setRoomStatusUpdateListener(this);
@@ -206,6 +242,10 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
             // show error message, return to main screen.
             Log.e("network", "onRoomCreated error");
+
+            if(mListeners != null) {
+                mListeners.onRoomError();
+            }
         } else {
             Intent i = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, Integer.MAX_VALUE);
             mActivity.startActivityForResult(i, RC_WAITING_ROOM);
@@ -220,6 +260,10 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
             // show error message, return to main screen.
             Log.e("network", "onJoinedRoom error");
+
+            if(mListeners != null) {
+                mListeners.onRoomError();
+            }
         } else {
             Intent i = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, Integer.MAX_VALUE);
             mActivity.startActivityForResult(i, RC_WAITING_ROOM);
@@ -227,7 +271,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     }
 
     @Override
-    public void onLeftRoom(int statusCode, String s) {
+    public void onLeftRoom(int statusCode, String roomId) {
 
     }
 
@@ -239,6 +283,12 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
             // show error message, return to main screen.
             Log.e("network", "onRoomConnected error");
+
+            if(mListeners != null) {
+                mListeners.onRoomError();
+            }
+        } else {
+            mRoom = room;
         }
     }
 
@@ -259,7 +309,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onPeerDeclined(Room room, List<String> list) {
-
+        Log.e("network", "onPeerDeclined");
     }
 
     @Override
@@ -269,7 +319,17 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onPeerLeft(Room room, List<String> list) {
+        Log.e("network", "onPeerLeft");
+    }
 
+    @Override
+    public void onPeersConnected(Room room, List<String> list) {
+        Log.e("network", "onPeersConnected");
+    }
+
+    @Override
+    public void onPeersDisconnected(Room room, List<String> list) {
+        Log.e("network", "onPeersDisconnected");
     }
 
     @Override
@@ -279,31 +339,51 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onDisconnectedFromRoom(Room room) {
+        mRoom = null;
+    }
+
+    @Override
+    public void onP2PConnected(String participantId) {
 
     }
 
     @Override
-    public void onPeersConnected(Room room, List<String> list) {
-
-    }
-
-    @Override
-    public void onPeersDisconnected(Room room, List<String> list) {
-
-    }
-
-    @Override
-    public void onP2PConnected(String s) {
-
-    }
-
-    @Override
-    public void onP2PDisconnected(String s) {
+    public void onP2PDisconnected(String participantId) {
 
     }
 
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
 
+    }
+
+    @Override
+    public void onInvitationReceived(final Invitation invitation) {
+        Log.e("network", "onInvitationReceived");
+
+        if(mListeners != null) {
+            mListeners.onInvitationReceived(new AndroidNetworkInvitation(this, invitation));
+        }
+    }
+
+    @Override
+    public void onInvitationRemoved(String invitationId) {
+
+    }
+
+    public Activity getActivity() {
+        return mActivity;
+    }
+
+    public GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    public Room getRoom() {
+        return mRoom;
+    }
+
+    public NetworkConfiguration getConfiguration() {
+        return mConfiguration;
     }
 }

@@ -1,15 +1,14 @@
 package com.playserviceshelper.test;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.playserviceshelper.lib.AndroidNetworkWorld;
-import com.playserviceshelper.lib.NetworkConfiguration;
-import com.playserviceshelper.lib.NetworkListeners;
-import com.playserviceshelper.lib.NetworkWorld;
+import com.playserviceshelper.lib.*;
 import com.playserviceshelper.lib.adapters.AndroidIntentAdapter;
 
 public class MainActivity extends Activity implements NetworkListeners {
@@ -57,7 +56,39 @@ public class MainActivity extends Activity implements NetworkListeners {
     }
 
     @Override
-    public void onConnected() {
-        mNetwork.invite(1, 1, 3);
+    public void onConnected(boolean autoJoin) {
+        if (!autoJoin) {
+            mNetwork.enableInvitation();
+            mNetwork.invite(1, 1, 3);
+        }
+    }
+
+    @Override
+    public void onInvitationReceived(final NetworkInvitation invitation) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Join?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        invitation.accept();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        invitation.decline();
+                    }
+                })
+                .show();
+    }
+
+    @Override
+    public void onRoomError() {
+
+    }
+
+    @Override
+    public void onStartSession() {
+
     }
 }
