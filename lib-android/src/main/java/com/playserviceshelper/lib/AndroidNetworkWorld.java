@@ -33,7 +33,6 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     protected Activity mActivity;
     protected GoogleApiClient mGoogleApiClient;
-    protected Room mRoom;
 
     protected NetworkConfiguration mConfiguration;
 
@@ -165,9 +164,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             } else if (requestCode == RC_WAITING_ROOM) {
                 if (resultCode == Activity.RESULT_OK) {
-                    if(mListeners != null) {
-                        mListeners.onStartSession();
-                    }
+
                 } else if (resultCode == Activity.RESULT_CANCELED) {
                     // Waiting room was dismissed with the back button. The meaning of this
                     // action is up to the game. You may choose to leave the room and cancel the
@@ -288,7 +285,11 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 mListeners.onRoomError();
             }
         } else {
-            mRoom = room;
+            mRoom = new AndroidNetworkRoom(room);
+
+            if(mListeners != null) {
+                mListeners.onStartSession();
+            }
         }
     }
 
@@ -377,10 +378,6 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     public GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
-    }
-
-    public Room getRoom() {
-        return mRoom;
     }
 
     public NetworkConfiguration getConfiguration() {

@@ -7,6 +7,7 @@ import com.playserviceshelper.lib.adapters.IntentAdapter;
  */
 public abstract class NetworkWorld {
     protected NetworkListeners mListeners;
+    protected NetworkRoom mRoom;
 
     public abstract void init(NetworkConfiguration networkConfiguration);
 
@@ -26,4 +27,8 @@ public abstract class NetworkWorld {
 
     public abstract void enableInvitation();
     public abstract void disableInvitation();
+
+    public NetworkRoom getRoom() {
+        return mRoom;
+    }
 }

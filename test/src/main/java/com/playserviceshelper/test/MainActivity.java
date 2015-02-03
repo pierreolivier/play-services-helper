@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import com.playserviceshelper.lib.*;
 import com.playserviceshelper.lib.adapters.AndroidIntentAdapter;
 
+import java.util.Arrays;
+
 public class MainActivity extends Activity implements NetworkListeners {
 
     protected NetworkWorld mNetwork;
@@ -89,6 +91,6 @@ public class MainActivity extends Activity implements NetworkListeners {
 
     @Override
     public void onStartSession() {
-
+        Log.e("network", Arrays.toString(mNetwork.getRoom().getEntities().toArray()));
     }
 }
