@@ -28,6 +28,8 @@ public abstract class NetworkWorld {
     public abstract void enableInvitation();
     public abstract void disableInvitation();
 
+    public abstract void leaveRoom();
+
     public NetworkRoom getRoom() {
         return mRoom;
     }

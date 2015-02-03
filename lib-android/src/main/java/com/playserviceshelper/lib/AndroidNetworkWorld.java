@@ -1,8 +1,6 @@
 package com.playserviceshelper.lib;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -113,7 +111,9 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     @Override
     public void onStop() {
         if(mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
+            leaveRoom();
+
+            mGoogleApiClient.disconnect();
         }
     }
 
@@ -172,12 +172,11 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                     // continue to connect in the background.
 
                     // in this example, we take the simple approach and just leave the room:
-                    // Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, mRoomId);
-                    mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    leaveRoom();
                 } else if (resultCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                     // player wants to leave the room.
                     // Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, mRoomId);
-                    mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    leaveRoom();
                 }
             }
         }
@@ -225,6 +224,17 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
         Games.Invitations.unregisterInvitationListener(mGoogleApiClient);
     }
 
+    @Override
+    public void leaveRoom() {
+        if(this.mRoom != null) {
+            Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, this.mRoom.getId());
+
+            mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            this.mRoom = null;
+        }
+    }
+
     public RoomConfig.Builder makeBasicRoomConfigBuilder() {
         return RoomConfig.builder(this)
                 .setMessageReceivedListener(this)
@@ -269,7 +279,9 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onLeftRoom(int statusCode, String roomId) {
-
+        if(mListeners != null) {
+            mListeners.onSessionEnd();
+        }
     }
 
     @Override
@@ -288,7 +300,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
             mRoom = new AndroidNetworkRoom(room);
 
             if(mListeners != null) {
-                mListeners.onStartSession();
+                mListeners.onSessionStart();
             }
         }
     }
@@ -355,7 +367,13 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
+        String id = realTimeMessage.getSenderParticipantId();
+        byte[] data = realTimeMessage.getMessageData();
 
+        NetworkEntity entity = mRoom.getEntity(id);
+        if(entity != null) {
+            entity.onMessage(data);
+        }
     }
 
     @Override

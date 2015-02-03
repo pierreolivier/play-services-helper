@@ -19,11 +19,16 @@ public class AndroidNetworkRoom extends NetworkRoom {
 
             NetworkEntity entity = new AndroidNetworkEntity(participant);
 
-            mEntities.add(entity);
+            mEntities.put(id, entity);
 
             if (id.equals(mRoom.getCreatorId())) {
                 mCreator = entity;
             }
         }
+    }
+
+    @Override
+    public String getId() {
+        return mRoom.getRoomId();
     }
 }

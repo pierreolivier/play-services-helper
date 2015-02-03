@@ -9,6 +9,7 @@ public interface NetworkListeners {
     void onInvitationReceived(NetworkInvitation invitation);
 
     void onRoomError();
-    void onStartSession();
+    void onSessionStart();
+    void onSessionEnd();
 
 }

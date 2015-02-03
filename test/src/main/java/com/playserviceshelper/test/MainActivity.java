@@ -90,7 +90,12 @@ public class MainActivity extends Activity implements NetworkListeners {
     }
 
     @Override
-    public void onStartSession() {
+    public void onSessionStart() {
         Log.e("network", Arrays.toString(mNetwork.getRoom().getEntities().toArray()));
+    }
+
+    @Override
+    public void onSessionEnd() {
+
     }
 }

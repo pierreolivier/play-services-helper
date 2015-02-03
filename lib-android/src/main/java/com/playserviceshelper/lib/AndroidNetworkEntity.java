@@ -13,6 +13,11 @@ public class AndroidNetworkEntity extends NetworkEntity {
     }
 
     @Override
+    public String getId() {
+        return mParticipant.getParticipantId();
+    }
+
+    @Override
     public String getName() {
         return mParticipant.getDisplayName();
     }
