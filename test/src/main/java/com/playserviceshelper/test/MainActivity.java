@@ -37,6 +37,7 @@ public class MainActivity extends Activity implements NetworkListeners {
 
         mNetwork = new AndroidNetworkWorld(this);
         mNetwork.setListeners(this);
+        mNetwork.setParser(new CustomMessageParser());
         mNetwork.init(configuration);
     }
 

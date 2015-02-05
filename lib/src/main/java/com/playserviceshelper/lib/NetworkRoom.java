@@ -1,5 +1,7 @@
 package com.playserviceshelper.lib;
 
+import com.playserviceshelper.lib.messages.NetworkMessage;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +18,9 @@ public abstract class NetworkRoom {
 
         mEntities = new HashMap<String, NetworkEntity>();
     }
+
+    public abstract void broadcastReliableMessage(NetworkMessage message);
+    public abstract void broadcastUnreliableMessage(NetworkMessage message);
 
     public abstract String getId();
 

@@ -1,13 +1,21 @@
 package com.playserviceshelper.lib;
 
 import com.playserviceshelper.lib.adapters.IntentAdapter;
+import com.playserviceshelper.lib.messages.MessageParser;
 
 /**
  * Created by Pierre-Olivier on 02/02/2015.
  */
 public abstract class NetworkWorld {
     protected NetworkListeners mListeners;
+    protected MessageParser mParser;
     protected NetworkRoom mRoom;
+
+    public NetworkWorld() {
+        super();
+
+        mParser = new MessageParser();
+    }
 
     public abstract void init(NetworkConfiguration networkConfiguration);
 
@@ -27,12 +35,22 @@ public abstract class NetworkWorld {
 
     public abstract void leaveRoom();
 
+    public void startHostElection() {
+
+    }
 
     public NetworkListeners getListeners() {
         return mListeners;
     }
     public void setListeners(NetworkListeners mListeners) {
         this.mListeners = mListeners;
+    }
+
+    public MessageParser getParser() {
+        return mParser;
+    }
+    public void setParser(MessageParser mParser) {
+        this.mParser = mParser;
     }
 
     public NetworkRoom getRoom() {

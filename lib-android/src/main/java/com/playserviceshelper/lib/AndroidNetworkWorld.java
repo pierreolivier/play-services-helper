@@ -17,6 +17,7 @@ import com.google.android.gms.games.multiplayer.realtime.*;
 import com.google.example.games.basegameutils.BaseGameUtils;
 import com.playserviceshelper.lib.adapters.AndroidIntentAdapter;
 import com.playserviceshelper.lib.adapters.IntentAdapter;
+import com.playserviceshelper.lib.messages.NetworkMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,8 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     private boolean mSignInClicked = false;
 
     public AndroidNetworkWorld(Activity mActivity) {
+        super();
+
         this.mActivity = mActivity;
     }
 
@@ -306,7 +309,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 mListeners.onRoomError();
             }
         } else {
-            mRoom = new AndroidNetworkRoom(room);
+            mRoom = new AndroidNetworkRoom(this, room);
 
             if(mListeners != null) {
                 mListeners.onSessionStart(this);
@@ -386,7 +389,10 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
         NetworkEntity entity = mRoom.getEntity(id);
         if(entity != null) {
-            entity.onMessage(data);
+            NetworkMessage message = mParser.onMessage(data);
+            if (message != null) {
+                entity.onMessage(message);
+            }
         }
     }
 
