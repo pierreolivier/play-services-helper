@@ -8,8 +8,10 @@ public interface NetworkListeners {
 
     void onInvitationReceived(NetworkInvitation invitation);
 
+    void onRoomCreation();
     void onRoomError();
-    void onSessionStart();
+
+    void onSessionStart(NetworkWorld network);
     void onSessionEnd();
 
 }

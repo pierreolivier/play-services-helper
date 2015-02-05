@@ -19,6 +19,10 @@ public class AndroidNetworkInvitation extends NetworkInvitation {
 
     @Override
     public void accept() {
+        if (mWorld.getListeners() != null) {
+            mWorld.getListeners().onRoomCreation();
+        }
+
         RoomConfig.Builder roomConfigBuilder = mWorld.makeBasicRoomConfigBuilder();
         roomConfigBuilder.setInvitationIdToAccept(mInvitation.getInvitationId());
         Games.RealTimeMultiplayer.join(mWorld.getGoogleApiClient(), roomConfigBuilder.build());

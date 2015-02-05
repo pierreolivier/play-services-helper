@@ -11,10 +11,6 @@ public abstract class NetworkWorld {
 
     public abstract void init(NetworkConfiguration networkConfiguration);
 
-    public void setListeners(NetworkListeners mListeners) {
-        this.mListeners = mListeners;
-    }
-
     public abstract void onStart();
     public abstract void onStop();
     public abstract void onActivityResult(int requestCode, int resultCode, IntentAdapter intent);
@@ -24,11 +20,20 @@ public abstract class NetworkWorld {
 
     public abstract void quickGame(int variant, int minAutoMatchPlayers, int maxAutoMatchPlayers);
     public abstract void invite(int variant, int minAutoMatchPlayers, int maxAutoMatchPlayers);
+    public abstract void gameOver();
 
     public abstract void enableInvitation();
     public abstract void disableInvitation();
 
     public abstract void leaveRoom();
+
+
+    public NetworkListeners getListeners() {
+        return mListeners;
+    }
+    public void setListeners(NetworkListeners mListeners) {
+        this.mListeners = mListeners;
+    }
 
     public NetworkRoom getRoom() {
         return mRoom;

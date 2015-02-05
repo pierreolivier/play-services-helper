@@ -136,6 +136,10 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                     return;
                 }
 
+                if (mListeners != null) {
+                    mListeners.onRoomCreation();
+                }
+
                 // get the invitee list
                 Bundle extras = intent.getExtras();
                 final ArrayList<String> invitees = intent.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
@@ -215,6 +219,11 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     }
 
     @Override
+    public void gameOver() {
+        leaveRoom();
+    }
+
+    @Override
     public void enableInvitation() {
         Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
     }
@@ -227,7 +236,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
     @Override
     public void leaveRoom() {
         if(this.mRoom != null) {
-            Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, this.mRoom.getId());
+            Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, this.mRoom.getId());
 
             mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -300,7 +309,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
             mRoom = new AndroidNetworkRoom(room);
 
             if(mListeners != null) {
-                mListeners.onSessionStart();
+                mListeners.onSessionStart(this);
             }
         }
     }
@@ -352,7 +361,12 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void onDisconnectedFromRoom(Room room) {
-        mRoom = null;
+        /*if (room.getParticipantIds().size() < 1) {
+            if (mListeners != null) {
+                mListeners.onSessionEnd();
+            }
+            mRoom = null;
+        }*/
     }
 
     @Override

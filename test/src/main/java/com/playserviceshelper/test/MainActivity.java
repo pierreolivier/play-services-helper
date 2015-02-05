@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,7 +62,8 @@ public class MainActivity extends Activity implements NetworkListeners {
     public void onConnected(boolean autoJoin) {
         if (!autoJoin) {
             mNetwork.enableInvitation();
-            mNetwork.invite(1, 1, 3);
+            // mNetwork.invite(1, 1, 3);
+            mNetwork.quickGame(1, 1, 3);
         }
     }
 
@@ -85,17 +87,29 @@ public class MainActivity extends Activity implements NetworkListeners {
     }
 
     @Override
+    public void onRoomCreation() {
+        Log.e("network", "onRoomCreation");
+    }
+
+    @Override
     public void onRoomError() {
 
     }
 
     @Override
-    public void onSessionStart() {
+    public void onSessionStart(NetworkWorld network) {
         Log.e("network", Arrays.toString(mNetwork.getRoom().getEntities().toArray()));
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mNetwork.gameOver();
+            }
+        }, 4000);
     }
 
     @Override
     public void onSessionEnd() {
-
+        Log.e("network", "onSessionEnd");
     }
 }
