@@ -99,7 +99,7 @@ public class MainActivity extends Activity implements NetworkListeners {
 
     @Override
     public void onSessionStart(NetworkWorld network) {
-        Log.e("network", Arrays.toString(mNetwork.getRoom().getEntities().toArray()));
+        Log.e("network", Arrays.toString(mNetwork.getHandler().getRoom().getEntities().toArray()));
 
         new Handler().postDelayed(new Runnable() {
             @Override

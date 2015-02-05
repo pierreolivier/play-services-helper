@@ -1,15 +1,18 @@
 package com.playserviceshelper.lib;
 
 import com.playserviceshelper.lib.adapters.IntentAdapter;
+import com.playserviceshelper.lib.listeners.NetworkEntityListeners;
 import com.playserviceshelper.lib.messages.MessageParser;
+import com.playserviceshelper.lib.messages.NetworkMessage;
 
 /**
  * Created by Pierre-Olivier on 02/02/2015.
  */
 public abstract class NetworkWorld {
+    protected NetworkWorldHandler mHandler;
     protected NetworkListeners mListeners;
     protected MessageParser mParser;
-    protected NetworkRoom mRoom;
+    // protected NetworkRoom mRoom;
 
     public NetworkWorld() {
         super();
@@ -35,8 +38,12 @@ public abstract class NetworkWorld {
 
     public abstract void leaveRoom();
 
-    public void startHostElection() {
+    public void onSessionStart() {
+        mHandler = new NetworkWorldHandler(this);
+    }
 
+    public void onSessionEnd() {
+        mHandler = null;
     }
 
     public NetworkListeners getListeners() {
@@ -53,7 +60,7 @@ public abstract class NetworkWorld {
         this.mParser = mParser;
     }
 
-    public NetworkRoom getRoom() {
-        return mRoom;
+    public NetworkWorldHandler getHandler() {
+        return mHandler;
     }
 }

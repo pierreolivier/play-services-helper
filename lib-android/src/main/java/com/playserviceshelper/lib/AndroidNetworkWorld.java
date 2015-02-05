@@ -238,12 +238,12 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
 
     @Override
     public void leaveRoom() {
-        if(this.mRoom != null) {
-            Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, this.mRoom.getId());
+        if(mHandler != null && mHandler.getRoom() != null) {
+            Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mHandler.getRoom().getId());
 
             mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-            this.mRoom = null;
+            mHandler.setRoom(null);
         }
     }
 
@@ -309,7 +309,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 mListeners.onRoomError();
             }
         } else {
-            mRoom = new AndroidNetworkRoom(this, room);
+            mHandler.setRoom(new AndroidNetworkRoom(this, room));
 
             if(mListeners != null) {
                 mListeners.onSessionStart(this);
@@ -387,10 +387,11 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
         String id = realTimeMessage.getSenderParticipantId();
         byte[] data = realTimeMessage.getMessageData();
 
-        NetworkEntity entity = mRoom.getEntity(id);
+        NetworkEntity entity = mHandler.getRoom().getEntity(id);
         if(entity != null) {
             NetworkMessage message = mParser.onMessage(data);
             if (message != null) {
+                mHandler.onMessage(entity, message);
                 entity.onMessage(message);
             }
         }
