@@ -101,12 +101,14 @@ public class MainActivity extends Activity implements NetworkListeners {
     public void onSessionStart(NetworkWorld network) {
         Log.e("network", Arrays.toString(mNetwork.getHandler().getRoom().getEntities().toArray()));
 
-        new Handler().postDelayed(new Runnable() {
+        mNetwork.getHandler().startHostElection();
+
+        /*new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mNetwork.gameOver();
             }
-        }, 4000);
+        }, 4000);*/
     }
 
     @Override

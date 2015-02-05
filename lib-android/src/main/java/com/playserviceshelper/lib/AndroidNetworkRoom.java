@@ -1,5 +1,6 @@
 package com.playserviceshelper.lib;
 
+import android.util.Log;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Participant;
@@ -32,7 +33,11 @@ public class AndroidNetworkRoom extends NetworkRoom {
 
             mEntities.put(id, entity);
 
-            if (id.equals(mRoom.getCreatorId())) {
+            if (mCreator == null) {
+                mCreator = entity;
+            }
+
+            if (mCreator.getId().compareTo(id) < 0) {
                 mCreator = entity;
             }
         }

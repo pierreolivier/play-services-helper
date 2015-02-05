@@ -3,6 +3,7 @@ package com.playserviceshelper.lib;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
@@ -18,6 +19,7 @@ import com.google.example.games.basegameutils.BaseGameUtils;
 import com.playserviceshelper.lib.adapters.AndroidIntentAdapter;
 import com.playserviceshelper.lib.adapters.IntentAdapter;
 import com.playserviceshelper.lib.messages.NetworkMessage;
+import com.playserviceshelper.lib.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,18 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
         super();
 
         this.mActivity = mActivity;
+
+        Logger.setLogger(new Logger.LoggerInterface() {
+            @Override
+            public void e(String t, String s) {
+                Log.e(t, s);
+            }
+
+            @Override
+            public void v(String t, String s) {
+                Log.v(t, s);
+            }
+        });
     }
 
     @Override
@@ -244,6 +258,7 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
             mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
             mHandler.setRoom(null);
+            onSessionEnd();
         }
     }
 
@@ -309,10 +324,17 @@ public class AndroidNetworkWorld extends NetworkWorld implements GoogleApiClient
                 mListeners.onRoomError();
             }
         } else {
+            onSessionStart();
+
             mHandler.setRoom(new AndroidNetworkRoom(this, room));
 
             if(mListeners != null) {
-                mListeners.onSessionStart(this);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListeners.onSessionStart(AndroidNetworkWorld.this);
+                    }
+                }, 2000);
             }
         }
     }

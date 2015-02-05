@@ -1,8 +1,10 @@
 package com.playserviceshelper.lib;
 
+import android.util.Log;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Participant;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMultiplayer;
 import com.playserviceshelper.lib.messages.NetworkMessage;
 
 /**
@@ -37,7 +39,12 @@ public class AndroidNetworkEntity extends NetworkEntity {
 
     @Override
     public void sendReliableMessage(byte[] message) {
-        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message, mRoomId, mParticipant.getParticipantId());
+        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, new RealTimeMultiplayer.ReliableMessageSentCallback() {
+            @Override
+            public void onRealTimeMessageSent(int statusCode, int tokenId, String recipientParticipantId) {
+                Log.e("network", "" + statusCode);
+            }
+        }, message, mRoomId, mParticipant.getParticipantId());
     }
 
     @Override

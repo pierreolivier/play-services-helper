@@ -14,7 +14,7 @@ public class CustomMessageParser extends MessageParser {
             byte id = data[0];
             switch(id) {
                 case (byte) 0x00:
-                    message = new PingMessage();
+                    message = new PingMessage(data);
                     break;
             }
         }

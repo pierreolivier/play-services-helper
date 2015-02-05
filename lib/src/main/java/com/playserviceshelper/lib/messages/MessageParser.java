@@ -10,10 +10,10 @@ public class MessageParser {
 
         switch(id) {
             case (byte) 0xE0:
-                message = new PingMessage();
+                message = new PingMessage(data);
                 break;
             case (byte) 0xE1:
-                message = new PongMessage();
+                message = new PongMessage(data);
                 break;
             case (byte) 0xE2:
                 message = new PingResultMessage(data);

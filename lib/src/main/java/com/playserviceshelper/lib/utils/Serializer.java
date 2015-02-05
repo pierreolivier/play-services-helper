@@ -6,6 +6,23 @@ import java.nio.ByteBuffer;
  * Created by Pierre-Olivier on 04/02/2015.
  */
 public class Serializer {
+    public static void putString(ByteBuffer buffer, String string) {
+        byte[] data = string.getBytes();
+
+        buffer.putInt(data.length);
+        buffer.put(data);
+    }
+
+    public static String getString(ByteBuffer buffer) {
+        int size = buffer.getInt();
+        byte[] data = new byte[size];
+
+        buffer.get(data, 0, size);
+
+        return new String(data);
+    }
+
+
     public static int size(Object... objects) {
         int size = 0;
         for (Object object : objects) {

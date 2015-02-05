@@ -17,6 +17,7 @@ public abstract class NetworkRoom {
         super();
 
         mEntities = new HashMap<String, NetworkEntity>();
+        mCreator = null;
     }
 
     public abstract void broadcastReliableMessage(NetworkMessage message);
