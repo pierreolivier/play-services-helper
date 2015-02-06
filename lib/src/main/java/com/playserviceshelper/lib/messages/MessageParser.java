@@ -18,6 +18,9 @@ public class MessageParser {
             case (byte) 0xE2:
                 message = new PingResultMessage(data);
                 break;
+            case (byte) 0xE3:
+                message = new NewHostMessage(data);
+                break;
         }
 
         return message;

@@ -48,7 +48,9 @@ public class AndroidNetworkRoom extends NetworkRoom {
         byte[] data = message.serialize();
 
         for (NetworkEntity entity : mEntities.values()) {
-            entity.sendReliableMessage(data);
+            if (!entity.getId().equals(mIdPlayer)) {
+                entity.sendReliableMessage(data);
+            }
         }
     }
 

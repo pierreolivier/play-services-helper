@@ -5,16 +5,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import com.playserviceshelper.lib.*;
 import com.playserviceshelper.lib.adapters.AndroidIntentAdapter;
+import com.playserviceshelper.lib.listeners.HostElectionListeners;
 
 import java.util.Arrays;
 
-public class MainActivity extends Activity implements NetworkListeners {
+public class MainActivity extends Activity implements NetworkListeners, HostElectionListeners {
 
     protected NetworkWorld mNetwork;
 
@@ -101,7 +99,7 @@ public class MainActivity extends Activity implements NetworkListeners {
     public void onSessionStart(NetworkWorld network) {
         Log.e("network", Arrays.toString(mNetwork.getHandler().getRoom().getEntities().toArray()));
 
-        mNetwork.getHandler().startHostElection();
+        mNetwork.getHandler().startHostElection(this);
 
         /*new Handler().postDelayed(new Runnable() {
             @Override
@@ -114,5 +112,15 @@ public class MainActivity extends Activity implements NetworkListeners {
     @Override
     public void onSessionEnd() {
         Log.e("network", "onSessionEnd");
+    }
+
+    @Override
+    public void onHostElected(boolean isHost) {
+        Log.e("network", "i'm hosting : " + isHost);
+    }
+
+    @Override
+    public void onHostElectionFailed() {
+        Log.e("network", "onHostElectionFailed");
     }
 }

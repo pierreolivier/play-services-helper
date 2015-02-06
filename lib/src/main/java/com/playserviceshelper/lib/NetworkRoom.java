@@ -11,12 +11,14 @@ import java.util.HashMap;
  */
 public abstract class NetworkRoom {
     protected HashMap<String, NetworkEntity> mEntities;
+    protected String mIdPlayer;
     protected NetworkEntity mCreator;
 
     public NetworkRoom() {
         super();
 
         mEntities = new HashMap<String, NetworkEntity>();
+        mIdPlayer = "";
         mCreator = null;
     }
 
@@ -24,6 +26,14 @@ public abstract class NetworkRoom {
     public abstract void broadcastUnreliableMessage(NetworkMessage message);
 
     public abstract String getId();
+
+    public String getIdPlayer() {
+        return mIdPlayer;
+    }
+
+    public void setIdPlayer(String mIdPlayer) {
+        this.mIdPlayer = mIdPlayer;
+    }
 
     public NetworkEntity getCreator() {
         return mCreator;
@@ -35,5 +45,9 @@ public abstract class NetworkRoom {
 
     public Collection<NetworkEntity> getEntities() {
         return mEntities.values();
+    }
+
+    public int getSize() {
+        return mEntities.values().size();
     }
 }

@@ -38,11 +38,11 @@ public class AndroidNetworkEntity extends NetworkEntity {
     }
 
     @Override
-    public void sendReliableMessage(byte[] message) {
+    public void sendReliableMessage(final byte[] message) {
         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, new RealTimeMultiplayer.ReliableMessageSentCallback() {
             @Override
             public void onRealTimeMessageSent(int statusCode, int tokenId, String recipientParticipantId) {
-                Log.e("network", "" + statusCode);
+                Log.e("network", "sendReliableMessage : " + statusCode + " message id: " + Integer.toHexString(message[0]));
             }
         }, message, mRoomId, mParticipant.getParticipantId());
     }
