@@ -7,5 +7,6 @@
 /test/src/main/res/values/ids.xml
 *.class
 lib/build/libs/lib-1.0.jar
+build/
 
 /scripts_debug

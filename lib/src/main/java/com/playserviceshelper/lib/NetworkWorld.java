@@ -12,7 +12,6 @@ public abstract class NetworkWorld {
     protected NetworkWorldHandler mHandler;
     protected NetworkListeners mListeners;
     protected MessageParser mParser;
-    // protected NetworkRoom mRoom;
 
     public NetworkWorld() {
         super();

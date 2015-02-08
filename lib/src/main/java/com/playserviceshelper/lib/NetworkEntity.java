@@ -26,8 +26,8 @@ public abstract class NetworkEntity {
     public abstract void sendUnreliableMessage(NetworkMessage message);
 
     public void onMessage(NetworkMessage message) {
-        if(this.mEntityListeners != null) {
-            this.mEntityListeners.onMessage(this, message);
+        if(mEntityListeners != null) {
+            mEntityListeners.onMessage(this, message);
         }
     }
 

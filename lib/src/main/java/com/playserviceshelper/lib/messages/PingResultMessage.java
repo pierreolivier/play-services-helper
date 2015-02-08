@@ -16,7 +16,7 @@ public class PingResultMessage extends NetworkMessage {
     private byte mId = (byte) 0xE2;
     private long mResult;
 
-    public PingResultMessage(int result, int number) {
+    public PingResultMessage(int result) {
         super();
 
         mResult = result;
